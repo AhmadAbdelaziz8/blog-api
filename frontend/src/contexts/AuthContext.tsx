@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { AuthService } from "../api";
-import { User, LoginCredentials, RegisterCredentials } from "../types";
+import type { User, LoginCredentials, RegisterCredentials } from "../types/index";
 
 interface AuthContextType {
   isAuthenticated: boolean;

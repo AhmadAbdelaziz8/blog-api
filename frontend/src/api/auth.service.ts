@@ -1,5 +1,10 @@
 import api from "./api";
-import { LoginCredentials, RegisterCredentials, AuthResponse } from "../types";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  AuthResponse,
+  User,
+} from "../types";
 
 export const AuthService = {
   // Login user
@@ -36,7 +41,7 @@ export const AuthService = {
   },
 
   // Get current user
-  getCurrentUser: (): any => {
+  getCurrentUser: (): User | null => {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       return JSON.parse(userStr);

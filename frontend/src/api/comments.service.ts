@@ -1,5 +1,5 @@
 import api from "./api";
-import { Comment } from "../types";
+import type { Comment } from "../types/index";
 
 export const CommentsService = {
   // Get all comments for a post

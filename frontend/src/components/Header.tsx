@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Role } from "../types";
+import type { Role } from "../types/index";
 
 const Header: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();

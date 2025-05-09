@@ -1,5 +1,5 @@
 import api from "./api";
-import { Post } from "../types";
+import type { Post } from "../types";
 
 export const PostsService = {
   // Get all published posts
