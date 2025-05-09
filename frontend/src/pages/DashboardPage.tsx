@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { PostsService } from "../api";
 import type { Post } from "../types/index";
 import { useAuth } from "../contexts/AuthContext";
+import { useNotification } from "../contexts/NotificationContext";
 import Layout from "../components/Layout";
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { notify } = useNotification();
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,9 +56,14 @@ const DashboardPage: React.FC = () => {
             : post
         )
       );
+      notify.success(
+        `Post ${
+          updatedPost.published ? "published" : "unpublished"
+        } successfully!`
+      );
     } catch (err) {
       console.error("Error toggling publish status:", err);
-      alert("Failed to update publish status. Please try again.");
+      notify.error("Failed to update publish status. Please try again.");
     }
   };
 
@@ -73,9 +80,10 @@ const DashboardPage: React.FC = () => {
       await PostsService.deletePost(postId);
       // Remove the post from the posts array
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      notify.success("Post deleted successfully.");
     } catch (err) {
       console.error("Error deleting post:", err);
-      alert("Failed to delete the post. Please try again.");
+      notify.error("Failed to delete the post. Please try again.");
     }
   };
 

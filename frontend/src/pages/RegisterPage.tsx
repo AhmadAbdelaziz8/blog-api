@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import type { Role } from "../types/index";
+import { useNotification } from "../contexts/NotificationContext";
+import { Role } from "../types/index";
 import Layout from "../components/Layout";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { notify } = useNotification();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,6 +34,7 @@ const RegisterPage: React.FC = () => {
     // Validate form
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      notify.error("Passwords do not match");
       return;
     }
 
@@ -40,12 +43,14 @@ const RegisterPage: React.FC = () => {
       // Omit confirmPassword from the data sent to the API
       const { confirmPassword, ...registrationData } = formData;
       await register(registrationData);
+      notify.success("Registration successful! Welcome to our blog platform.");
       navigate("/");
     } catch (err: any) {
       console.error("Registration error:", err);
       setError(
         err.response?.data?.message || "Registration failed. Please try again."
       );
+      notify.error("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }

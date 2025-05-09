@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useNotification } from "../contexts/NotificationContext";
 import Layout from "../components/Layout";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { notify } = useNotification();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -26,12 +28,14 @@ const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await login(formData);
+      notify.success("Login successful!");
       navigate("/");
     } catch (err: any) {
       console.error("Login error:", err);
       setError(
         err.response?.data?.message || "Invalid credentials. Please try again."
       );
+      notify.error("Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }

@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Editor } from "@tinymce/tinymce-react";
 import { PostsService } from "../api";
 import { useAuth } from "../contexts/AuthContext";
+import { useNotification } from "../contexts/NotificationContext";
 import Layout from "../components/Layout";
 
 const PostFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { notify } = useNotification();
   const isEditMode = !!id;
+  const editorRef = useRef<any>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -79,6 +83,13 @@ const PostFormPage: React.FC = () => {
     }));
   };
 
+  const handleEditorChange = (content: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      content,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -86,10 +97,13 @@ const PostFormPage: React.FC = () => {
     try {
       setLoading(true);
 
+      // Get content directly from state
       if (isEditMode && id) {
         await PostsService.updatePost(id, formData);
+        notify.success("Post updated successfully!");
       } else {
         await PostsService.createPost(formData);
+        notify.success("Post created successfully!");
       }
 
       // Redirect to the dashboard after successful submit
@@ -99,6 +113,7 @@ const PostFormPage: React.FC = () => {
       setError(
         err.response?.data?.message || "Failed to save post. Please try again."
       );
+      notify.error("Failed to save post. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -147,14 +162,27 @@ const PostFormPage: React.FC = () => {
             <label htmlFor="content" className="block text-gray-700 mb-2">
               Content
             </label>
-            <textarea
-              id="content"
-              name="content"
+            <Editor
+              apiKey="no-api-key" // Using local mode, no API key required
+              onInit={(evt, editor) => (editorRef.current = editor)}
+              initialValue={formData.content}
               value={formData.content}
-              onChange={handleChange}
-              rows={15}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              onEditorChange={handleEditorChange}
+              init={{
+                height: 500,
+                menubar: true,
+                plugins: [
+                  "advlist autolink lists link image charmap print preview anchor",
+                  "searchreplace visualblocks code fullscreen",
+                  "insertdatetime media table paste code help wordcount",
+                ],
+                toolbar:
+                  "undo redo | formatselect | bold italic backcolor | \
+                  alignleft aligncenter alignright alignjustify | \
+                  bullist numlist outdent indent | removeformat | help",
+                content_style:
+                  "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              }}
             />
           </div>
 
