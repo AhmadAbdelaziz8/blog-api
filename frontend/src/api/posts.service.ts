@@ -5,19 +5,19 @@ export const PostsService = {
   // Get all published posts
   getAllPosts: async (): Promise<Post[]> => {
     const response = await api.get<Post[]>("/posts");
-    return response.data;
+    return response;
   },
 
   // Get a single post by id
   getPostById: async (id: string): Promise<Post> => {
     const response = await api.get<Post>(`/posts/${id}`);
-    return response.data;
+    return response;
   },
 
   // Get all posts for the author dashboard (including unpublished)
   getAuthorPosts: async (): Promise<Post[]> => {
     const response = await api.get<Post[]>("/posts/author/dashboard");
-    return response.data;
+    return response;
   },
 
   // Create a new post
@@ -27,7 +27,7 @@ export const PostsService = {
     published: boolean;
   }): Promise<Post> => {
     const response = await api.post<Post>("/posts", postData);
-    return response.data;
+    return response;
   },
 
   // Update an existing post
@@ -36,17 +36,17 @@ export const PostsService = {
     postData: { title: string; content: string; published: boolean }
   ): Promise<Post> => {
     const response = await api.put<Post>(`/posts/${id}`, postData);
-    return response.data;
+    return response;
   },
 
   // Delete a post
   deletePost: async (id: string): Promise<void> => {
-    await api.delete(`/posts/${id}`);
+    await api.delete<void>(`/posts/${id}`);
   },
 
   // Toggle post publish status
   togglePublishStatus: async (id: string): Promise<Post> => {
     const response = await api.patch<Post>(`/posts/${id}/publish`);
-    return response.data;
+    return response;
   },
 };

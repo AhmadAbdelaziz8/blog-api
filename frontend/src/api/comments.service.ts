@@ -5,7 +5,7 @@ export const CommentsService = {
   // Get all comments for a post
   getPostComments: async (postId: string): Promise<Comment[]> => {
     const response = await api.get<Comment[]>(`/comments/post/${postId}`);
-    return response.data;
+    return response;
   },
 
   // Create a new comment on a post
@@ -13,17 +13,17 @@ export const CommentsService = {
     const response = await api.post<Comment>(`/comments/post/${postId}`, {
       content,
     });
-    return response.data;
+    return response;
   },
 
   // Update a comment
   updateComment: async (id: string, content: string): Promise<Comment> => {
     const response = await api.put<Comment>(`/comments/${id}`, { content });
-    return response.data;
+    return response;
   },
 
   // Delete a comment
   deleteComment: async (id: string): Promise<void> => {
-    await api.delete(`/comments/${id}`);
+    await api.delete<void>(`/comments/${id}`);
   },
 };

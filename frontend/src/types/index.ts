@@ -61,3 +61,10 @@ export interface AuthResponse {
   token: string;
   user: User;
 }
+
+// API Interfaces
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export interface ApiOptions {
+  headers?: Record<string, string>;
+}

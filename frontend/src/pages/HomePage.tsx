@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PostsService } from "../api";
 import type { Post } from "../types/index";
 import Layout from "../components/Layout";
+import { Role } from "../types";
 
 // Helper function to strip HTML tags for preview
 const stripHtml = (html: string) => {
@@ -20,10 +21,55 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
+// Mock data for when backend is unavailable
+const MOCK_POSTS: Post[] = [
+  {
+    id: "mock-1",
+    title: "Welcome to the Blog Platform",
+    content: "<p>This is a demo post shown when the backend server is unavailable. Please start the backend server to see actual content.</p><p>The blog platform allows you to read and write interesting articles on various topics.</p>",
+    published: true,
+    authorId: "mock-author-1",
+    author: {
+      id: "mock-author-1",
+      email: "demo@example.com",
+      username: "Demo User",
+      role: Role.AUTHOR,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    _count: {
+      comments: 0
+    }
+  },
+  {
+    id: "mock-2",
+    title: "Getting Started with the Blog Platform",
+    content: "<p>This mock post provides information about how to use the blog platform. To see real content, please make sure the backend server is running.</p><p>You can register as an author to create your own posts or as a regular user to comment on posts.</p>",
+    published: true,
+    authorId: "mock-author-1",
+    author: {
+      id: "mock-author-1",
+      email: "demo@example.com",
+      username: "Demo User",
+      role: Role.AUTHOR,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    _count: {
+      comments: 0
+    }
+  }
+];
+
 const HomePage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -32,9 +78,19 @@ const HomePage: React.FC = () => {
         const data = await PostsService.getAllPosts();
         setPosts(data);
         setError(null);
-      } catch (err) {
+        setIsUsingMockData(false);
+      } catch (err: any) {
         console.error("Error fetching posts:", err);
-        setError("Failed to load posts. Please try again later.");
+        
+        // Check if it's a connection error
+        if (err.message && err.message.includes("Unable to connect to the server")) {
+          console.log("Using mock data due to server connection issue");
+          setPosts(MOCK_POSTS);
+          setIsUsingMockData(true);
+          setError("Using demo content. Backend server is not running.");
+        } else {
+          setError("Failed to load posts. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
@@ -56,6 +112,21 @@ const HomePage: React.FC = () => {
           </p>
         </header>
 
+        {isUsingMockData && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-lg">
+            <p className="font-medium">
+              {error} 
+              <a 
+                href="#" 
+                onClick={() => window.location.reload()} 
+                className="underline ml-1 hover:text-amber-900"
+              >
+                Refresh to try again
+              </a>
+            </p>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-pulse flex flex-col items-center">
@@ -63,7 +134,7 @@ const HomePage: React.FC = () => {
               <div className="text-indigo-500 text-lg">Loading posts...</div>
             </div>
           </div>
-        ) : error ? (
+        ) : error && !isUsingMockData ? (
           <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-lg text-center">
             <p className="font-medium">{error}</p>
             <button

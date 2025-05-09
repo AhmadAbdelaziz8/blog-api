@@ -11,20 +11,20 @@ export const AuthService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
     // Store the token in localStorage
-    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.token);
     // Store user info
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    return response.data;
+    localStorage.setItem("user", JSON.stringify(response.user));
+    return response;
   },
 
   // Register user
   register: async (userData: RegisterCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/register", userData);
     // Store the token in localStorage
-    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.token);
     // Store user info
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    return response.data;
+    localStorage.setItem("user", JSON.stringify(response.user));
+    return response;
   },
 
   // Logout user
